@@ -144,6 +144,16 @@ class SimplifiedJSSVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SimplifiedJSSParser#forInit.
+    def visitForInit(self, ctx:SimplifiedJSSParser.ForInitContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SimplifiedJSSParser#varDeclNoSemi.
+    def visitVarDeclNoSemi(self, ctx:SimplifiedJSSParser.VarDeclNoSemiContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SimplifiedJSSParser#breakStmt.
     def visitBreakStmt(self, ctx:SimplifiedJSSParser.BreakStmtContext):
         return self.visitChildren(ctx)
@@ -231,6 +241,11 @@ class SimplifiedJSSVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SimplifiedJSSParser#unary.
     def visitUnary(self, ctx:SimplifiedJSSParser.UnaryContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SimplifiedJSSParser#postfix.
+    def visitPostfix(self, ctx:SimplifiedJSSParser.PostfixContext):
         return self.visitChildren(ctx)
 
 

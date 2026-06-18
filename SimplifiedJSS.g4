@@ -125,7 +125,16 @@ whileStmt
     ;
 
 forStmt
-    : FOR LPAREN expr? SEMI expr? SEMI expr? RPAREN block
+    : FOR LPAREN forInit? SEMI expr? SEMI expr? RPAREN block
+    ;
+
+forInit
+    : varDeclNoSemi
+    | expr
+    ;
+
+varDeclNoSemi
+    : LET type declaratorList
     ;
 
 breakStmt
@@ -208,7 +217,11 @@ power
 
 unary
     : (NOT | PLUS | MINUS | INC | DEC) unary
-    | primary
+    | postfix
+    ;
+
+postfix
+    : primary (INC | DEC)?
     ;
 
 primary

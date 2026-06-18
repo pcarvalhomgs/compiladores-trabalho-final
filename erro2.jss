@@ -1,8 +1,11 @@
-function void asdf(int a) {
-    console.log ("Soma: ", a); 
-}
+let int x;
 
 function void main() {
-    let int x = 9;
-    asdf(x);
+    for (let int i = 0; i < 5; i++) {
+        console.log(i);
+    }
+
+    for (x = 0; x < 5; x++) {
+        console.log(x);
+    }
 }

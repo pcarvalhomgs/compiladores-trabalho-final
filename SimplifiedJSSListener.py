@@ -251,6 +251,24 @@ class SimplifiedJSSListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SimplifiedJSSParser#forInit.
+    def enterForInit(self, ctx:SimplifiedJSSParser.ForInitContext):
+        pass
+
+    # Exit a parse tree produced by SimplifiedJSSParser#forInit.
+    def exitForInit(self, ctx:SimplifiedJSSParser.ForInitContext):
+        pass
+
+
+    # Enter a parse tree produced by SimplifiedJSSParser#varDeclNoSemi.
+    def enterVarDeclNoSemi(self, ctx:SimplifiedJSSParser.VarDeclNoSemiContext):
+        pass
+
+    # Exit a parse tree produced by SimplifiedJSSParser#varDeclNoSemi.
+    def exitVarDeclNoSemi(self, ctx:SimplifiedJSSParser.VarDeclNoSemiContext):
+        pass
+
+
     # Enter a parse tree produced by SimplifiedJSSParser#breakStmt.
     def enterBreakStmt(self, ctx:SimplifiedJSSParser.BreakStmtContext):
         pass
@@ -410,6 +428,15 @@ class SimplifiedJSSListener(ParseTreeListener):
 
     # Exit a parse tree produced by SimplifiedJSSParser#unary.
     def exitUnary(self, ctx:SimplifiedJSSParser.UnaryContext):
+        pass
+
+
+    # Enter a parse tree produced by SimplifiedJSSParser#postfix.
+    def enterPostfix(self, ctx:SimplifiedJSSParser.PostfixContext):
+        pass
+
+    # Exit a parse tree produced by SimplifiedJSSParser#postfix.
+    def exitPostfix(self, ctx:SimplifiedJSSParser.PostfixContext):
         pass
 
 

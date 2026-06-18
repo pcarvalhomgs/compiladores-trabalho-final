@@ -435,23 +435,69 @@ class StaticChecker(SimplifiedJSSVisitor):
         self.loop_depth -= 1
 
     def visitForStmt(self, ctx):
+        self.enterScope()
+
+        if ctx.forInit():
+            self.visit(ctx.forInit())
+
         exprs = ctx.expr()
 
         if len(exprs) >= 1:
-            self.visit(exprs[0])
-
-        if len(exprs) >= 2:
-            cond_type = self.visit(exprs[1])
+            cond_type = self.visit(exprs[0])
 
             if cond_type != "bool":
                 self.error(ctx, "condição do for deve ser bool")
 
-        if len(exprs) >= 3:
-            self.visit(exprs[2])
+        if len(exprs) >= 2:
+            self.visit(exprs[1])
 
         self.loop_depth += 1
         self.visit(ctx.block())
         self.loop_depth -= 1
+
+        self.exitScope()
+
+    def visitForInit(self, ctx):
+        if ctx.varDeclNoSemi():
+            return self.visit(ctx.varDeclNoSemi())
+
+        if ctx.expr():
+            return self.visit(ctx.expr())
+
+        return None
+
+    def visitVarDeclNoSemi(self, ctx):
+        var_type = self.getType(ctx.type_())
+        array_size = self.getArraySize(ctx.type_())
+
+        self.ensureTypeExists(ctx, var_type)
+
+        for decl in ctx.declaratorList().declarator():
+            name = decl.ID().getText()
+            initialized = False
+
+            if decl.expr():
+                expr_type = self.visit(decl.expr())
+
+                if self.isArrayType(var_type):
+                    self.checkArrayInitialization(ctx, var_type, array_size, expr_type)
+                else:
+                    self.ensureAssignable(ctx, var_type, expr_type)
+
+                initialized = True
+
+            self.current_scope.define(
+                Symbol(
+                    name=name,
+                    type=var_type,
+                    kind="var",
+                    initialized=initialized,
+                    array_size=array_size
+                ),
+                decl.start.line
+            )
+
+        return None
 
     def visitBreakStmt(self, ctx):
         if self.loop_depth == 0:
@@ -654,8 +700,8 @@ class StaticChecker(SimplifiedJSSVisitor):
         return left
 
     def visitUnary(self, ctx):
-        if ctx.primary():
-            return self.visit(ctx.primary())
+        if ctx.postfix():
+            return self.visit(ctx.postfix())
 
         op = ctx.getChild(0).getText()
         operand_type = self.visit(ctx.unary())
@@ -665,12 +711,51 @@ class StaticChecker(SimplifiedJSSVisitor):
                 self.error(ctx, "operador ! exige bool")
             return "bool"
 
-        if op in {"+", "-", "++", "--"}:
+        if op in {"+", "-"}:
             if not self.isNumeric(operand_type):
                 self.error(ctx, f"operador {op} exige int ou real")
             return operand_type
 
+        if op in {"++", "--"}:
+            child = ctx.unary()
+
+            if not child.postfix() or not child.postfix().primary().assignable():
+                self.error(ctx, f"operador {op} exige variável modificável")
+
+            symbol = self.resolveAssignableSymbol(
+                child.postfix().primary().assignable()
+            )
+
+            if symbol.kind == "const":
+                self.error(ctx, f"não é possível modificar constante '{symbol.name}'")
+
+            if not self.isNumeric(symbol.type):
+                self.error(ctx, f"operador {op} exige variável int ou real")
+
+            return symbol.type
+
         return operand_type
+    
+    def visitPostfix(self, ctx):
+        base_type = self.visit(ctx.primary())
+
+        if ctx.INC() or ctx.DEC():
+            primary = ctx.primary()
+
+            if not primary.assignable():
+                self.error(ctx, "operador ++/-- pós-fixado exige variável modificável")
+
+            symbol = self.resolveAssignableSymbol(primary.assignable())
+
+            if symbol.kind == "const":
+                self.error(ctx, f"não é possível modificar constante '{symbol.name}'")
+
+            if not self.isNumeric(symbol.type):
+                self.error(ctx, "operador ++/-- exige variável int ou real")
+
+            return symbol.type
+
+        return base_type
 
     def visitPrimary(self, ctx):
         if ctx.literal():
