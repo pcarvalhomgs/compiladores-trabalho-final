@@ -275,6 +275,6 @@ class SimplifiedJSSLexer(Lexer):
         self.checkVersion("4.13.2")
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
-        self._predicates = None
+        self._predicates = None 
 
 
