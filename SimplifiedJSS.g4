@@ -36,8 +36,8 @@ constDeclarator
     ;
 
 type
-    : primitiveType arraySuffix?
-    | ID arraySuffix?
+    : primitiveType arraySuffix*
+    | ID arraySuffix*
     ;
 
 primitiveType
@@ -185,6 +185,8 @@ assignOp
     | MUL_ASSIGN
     | DIV_ASSIGN
     | MOD_ASSIGN
+    | AND_ASSIGN
+    | OR_ASSIGN
     ;
 
 logicalOr
@@ -320,6 +322,9 @@ LOG         : 'log';
 // --------------------
 // Operadores
 // --------------------
+
+AND_ASSIGN : '&&=';
+OR_ASSIGN  : '||=';
 
 PLUS_ASSIGN  : '+=';
 MINUS_ASSIGN : '-=';

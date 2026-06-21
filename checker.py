@@ -548,12 +548,42 @@ class StaticChecker(SimplifiedJSSVisitor):
                     f"não é possível atribuir valor à constante '{target.name}'"
                 )
 
+            op = ctx.assignOp().getText()
             right_type = self.visit(ctx.assignment())
-            self.ensureAssignable(ctx, target.type, right_type)
+
+            if op == "=":
+                self.ensureAssignable(ctx, target.type, right_type)
+
+            elif op in {"+=", "-=", "*=", "/=", "%="}:
+                self.checkCompoundArithmetic(ctx, target.type, right_type, op)
+
+            elif op in {"&&=", "||="}:
+                self.checkCompoundBoolean(ctx, target.type, right_type, op)
 
             return target.type
 
         return self.visit(ctx.logicalOr())
+    
+    def checkCompoundArithmetic(self, ctx, left, right, op):
+        if op == "+=" and (left == "str" or right == "str"):
+            if left != "str":
+                self.error(ctx, f"operador {op} exige variável str quando há concatenação")
+            return
+
+        if not self.isNumeric(left) or not self.isNumeric(right):
+            self.error(ctx, f"operador {op} exige operandos numéricos")
+
+        if op == "%=" and (left != "int" or right != "int"):
+            self.error(ctx, "operador %= exige operandos int")
+
+        if left == "int" and right == "real":
+            self.error(ctx, f"não é possível aplicar {op} entre int e real")
+
+        return
+    
+    def checkCompoundBoolean(self, ctx, left, right, op):
+        if left != "bool" or right != "bool":
+            self.error(ctx, f"operador {op} exige operandos bool")
 
     def visitLogicalOr(self, ctx):
         items = ctx.logicalAnd()
@@ -589,16 +619,20 @@ class StaticChecker(SimplifiedJSSVisitor):
 
     def visitEquality(self, ctx):
         items = ctx.relational()
-
+        
         result = self.visit(items[0])
 
         for item in items[1:]:
             right = self.visit(item)
 
-            if result != right:
-                self.error(ctx, f"igualdade inválida entre {result} e {right}")
+            if self.isNumeric(result) and self.isNumeric(right):
+                result = "bool"
 
-            result = "bool"
+            elif result == right:
+                result = "bool"
+
+            else:
+                self.error(ctx, f"igualdade inválida entre {result} e {right}")
 
         return result
 
@@ -611,13 +645,14 @@ class StaticChecker(SimplifiedJSSVisitor):
         for item in items[1:]:
             right = self.visit(item)
 
-            if result != right:
+            if self.isNumeric(result) and self.isNumeric(right):
+                result = "bool"
+
+            elif result == right and result in {"str", "bool"}:
+                result = "bool"
+
+            else:
                 self.error(ctx, f"comparação inválida entre {result} e {right}")
-
-            if self.isArrayType(result):
-                self.error(ctx, "vetores não podem ser comparados diretamente")
-
-            result = "bool"
 
         return result
 
@@ -631,15 +666,15 @@ class StaticChecker(SimplifiedJSSVisitor):
             right = self.visit(items[i])
             op = ctx.getChild(2 * i - 1).getText()
 
-            if op == "+" and result == "str" and right == "str":
+            if op == "+" and result == "str" or right == "str":
                 result = "str"
 
             elif op in {"+", "-"} and self.isNumeric(result) and self.isNumeric(right):
-                if result != right:
-                    self.error(
-                        ctx,
-                        f"operação {op} inválida entre {result} e {right}; use cast explícito"
-                    )
+
+                if result == "real" or right == "real":
+                    result = "real"
+                else:
+                    result = "int"
 
             else:
                 self.error(ctx, f"operador {op} inválido entre {result} e {right}")
@@ -659,11 +694,10 @@ class StaticChecker(SimplifiedJSSVisitor):
             if not self.isNumeric(result) or not self.isNumeric(right):
                 self.error(ctx, f"operador {op} exige operandos numéricos")
 
-            if result != right:
-                self.error(
-                    ctx,
-                    f"operação {op} inválida entre {result} e {right}; use cast explícito"
-                )
+            elif result == "real" or right == "real":
+                    result = "real"
+            else:
+                result = "int"
 
             if op == "%" and result != "int":
                 self.error(ctx, "operador % exige operandos int")
@@ -1017,17 +1051,18 @@ class StaticChecker(SimplifiedJSSVisitor):
 
     def getType(self, ctx):
         base = ctx.getChild(0).getText()
+        dimensions = len(ctx.arraySuffix())
 
-        if ctx.arraySuffix():
-            return f"{base}[]"
-
-        return base
+        return base + ("[]" * dimensions)
 
     def getArraySize(self, ctx):
         if not ctx.arraySuffix():
             return None
 
-        return int(ctx.arraySuffix().INT_LITERAL().getText())
+        return [
+            int(s.INT_LITERAL().getText())
+            for s in ctx.arraySuffix()
+        ]
 
     def getReturnType(self, ctx):
         return ctx.getText()

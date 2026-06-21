@@ -1,13 +1,17 @@
 function void main() {
 
-    let bool a = true;
-    let bool b = false;
+    let int a = 10;
+    let real b = 5.5;
+    let bool ativo = true;
 
-    if (a && !b) {
-        console.log("ok");
-    }
+    console.log(a < b);
+    console.log(a >= b);
 
-    if (a || b) {
-        console.log("verdadeiro");
-    }
+    console.log(a == 10);
+    console.log(b != 10.0);
+
+    console.log((a < b) && ativo);
+    console.log((a > b) || ativo);
+
+    console.log(!(a > b));
 }
