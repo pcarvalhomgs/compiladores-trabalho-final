@@ -14,18 +14,13 @@ class SyntaxErrorListener(ErrorListener):
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
 
         token = offendingSymbol.text if offendingSymbol else "<EOF>"
-        
-        if 1 <= line <= len(self.source_lines):
-            source_line = self.source_lines[line - 1].rstrip()
-            print(source_line)
-            print(" " * column + "^")
 
         try:
             expected = recognizer.getExpectedTokens().toString(
                 recognizer.literalNames,
                 recognizer.symbolicNames
             )
-            print(f"Linha {line}: erro léxico/sintático encontrado: {token}, esperava: {expected}")
+            print(f"[Linha {line}]: erro léxico/sintático [encontrado: {token}], [esperava: {expected}]")
 
         except Exception:
             pass

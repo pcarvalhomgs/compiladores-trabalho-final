@@ -5,10 +5,9 @@ program
     ;
 
 topLevelDecl
-    : varDecl
-    | constDecl
-    | functionDecl
+    : functionDecl
     | classDecl
+    | statement
     ;
 
 varDecl
@@ -87,7 +86,7 @@ constructorDecl
     ;
 
 methodDecl
-    : type ID LPAREN paramList? RPAREN block
+    : returnType ID LPAREN paramList? RPAREN block
     ;
 
 block

@@ -36,7 +36,7 @@ class Scope:
     def define(self, symbol, line):
         if symbol.name in self.symbols:
             raise SemanticError(
-                f"Linha {line}: variável '{symbol.name}' já declarado neste escopo"
+                f"[Linha {line}]: variável '{symbol.name}' já declarado neste escopo."
             )
         self.symbols[symbol.name] = symbol
 
@@ -70,22 +70,25 @@ class StaticChecker(SimplifiedJSSVisitor):
 
     def error(self, ctx, msg):
         line = ctx.start.line if hasattr(ctx, "start") and ctx.start else "?"
-        raise SemanticError(f"Linha {line}: {msg}")
+        raise SemanticError(f"[Linha {line}]: {msg}")
 
     # --------------------------------------------------
     # Programa
     # --------------------------------------------------
 
     def visitProgram(self, ctx):
+        # 1. Pré-declara classes e funções globais
         for decl in ctx.topLevelDecl():
             if decl.classDecl():
                 self.predeclareClass(decl.classDecl())
             elif decl.functionDecl():
                 self.predeclareFunction(decl.functionDecl())
 
+        # 2. Visita tudo, incluindo statements globais
         for decl in ctx.topLevelDecl():
             self.visit(decl)
 
+        # 3. main continua facultativa
         main = self.global_scope.resolve("main")
 
         if main:
@@ -233,7 +236,7 @@ class StaticChecker(SimplifiedJSSVisitor):
         if function_symbol.return_type != "void" and not has_return:
             self.error(
                 ctx,
-                f"função '{name}' deve retornar {function_symbol.return_type}"
+                f"função '{name}' deve retornar {function_symbol.return_type}."
             )
 
         self.exitScope()
@@ -332,7 +335,7 @@ class StaticChecker(SimplifiedJSSVisitor):
 
     def visitMethodDecl(self, ctx):
         method_name = ctx.ID().getText()
-        ret_type = self.getType(ctx.type_())
+        ret_type = self.getReturnType(ctx.returnType())
         params = self.getParams(ctx.paramList())
 
         if method_name in self.current_class.methods:
