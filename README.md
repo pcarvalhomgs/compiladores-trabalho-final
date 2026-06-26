@@ -37,9 +37,11 @@ python main.py entrada.jss
 Troque o arquivo de entrada:
 
 ```bash
-python main.py entrada2.jss
-python main.py entrada3.jss
-python main.py entrada4.jss
+python main.py <outro_arquivo.jss>
+```
+ou:
+```bash
+python main.py testes\<arquivo.jss>
 ```
 
 ## 4. Saida esperada 
