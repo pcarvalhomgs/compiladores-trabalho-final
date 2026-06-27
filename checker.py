@@ -1109,7 +1109,7 @@ class StaticChecker(SimplifiedJSSVisitor):
         if actual_base != expected_type:
             self.error(ctx, f"vetor esperado {expected_type}, recebido {actual_base}")
 
-        if expected_size is not None and actual_len != expected_size:
+        if expected_size is not None and actual_len != expected_size[0]:
             self.error(
                 ctx,
                 f"vetor esperado com {expected_size} elemento(s), recebeu {actual_len}"

@@ -1,4 +1,4 @@
-# Trabalho final Compiladores - FrontEnd
+# Trabalho final Compiladores
 
 Este projeto compõe a primeira parte do trabalho final da disciplina de compiladores.  
 Nele é relizado a analise lexica/sintatica com ANTLR e checagem semantica em Python para uma linguagem simplificada de JSS fortemente tipada.
