@@ -560,8 +560,6 @@ class StaticChecker(SimplifiedJSSVisitor):
             elif op in {"+=", "-=", "*=", "/=", "%="}:
                 self.checkCompoundArithmetic(ctx, target.type, right_type, op)
 
-            elif op in {"&&=", "||="}:
-                self.checkCompoundBoolean(ctx, target.type, right_type, op)
 
             return target.type
 
@@ -584,9 +582,6 @@ class StaticChecker(SimplifiedJSSVisitor):
 
         return
     
-    def checkCompoundBoolean(self, ctx, left, right, op):
-        if left != "bool" or right != "bool":
-            self.error(ctx, f"operador {op} exige operandos bool")
 
     def visitLogicalOr(self, ctx):
         items = ctx.logicalAnd()

@@ -4,6 +4,7 @@ from antlr4.error.ErrorListener import ErrorListener
 from SimplifiedJSSLexer import SimplifiedJSSLexer
 from SimplifiedJSSParser import SimplifiedJSSParser
 from checker import StaticChecker
+from codegen import CodeGenerator
 
 class SyntaxErrorListener(ErrorListener):
 
@@ -52,13 +53,6 @@ def main():
 
     tree = parser.program()
 
-    '''
-    # imprime a arvore (opcional).
-    print('\n')
-    print(tree.toStringTree(recog=parser))
-    print('\n')
-    '''
-
     #Se existir erros léxicos ou sintáticos detectados, encerra sem chamar o checador semântico.
     if parser.getNumberOfSyntaxErrors() > 0:
         return
@@ -71,7 +65,13 @@ def main():
             print(err)
     else:
         print("aceito")
-        #Implementar depois: llvm_ir = CodeGenerator().generate(tree)
+        # llvm_ir = CodeGenerator().generate(tree)
+
+        # output_path = sys.argv[2] if len(sys.argv) == 3 else "IR_gerado.ll"
+    
+        # with open(output_path, "w", encoding="utf-8") as output_file:
+        #     output_file.write(llvm_ir)
+        # print(f"IR LLVM salvo em {output_path}")
 
 
 if __name__ == "__main__":
