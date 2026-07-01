@@ -1,4 +1,4 @@
-# Trabalho final Compiladores
+# Compilador para a Linguagem Simplified JSS
 
 Este projeto consiste no desenvolvimento de um compilador para a linguagem Simplified JSS (JavaScript Simplificado), uma linguagem imperativa, \
 orientada a objetos e fortemente tipada, criada para fins acadêmicos na disciplina de Compiladores.
