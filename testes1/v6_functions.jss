@@ -35,14 +35,6 @@ function int somarArray(int[5] arr) {
     return total;
 }
 
-// Funcao que retorna array (não implementado)
-//function int[5] criarSequencia(int inicio) {
-//    let int[5] seq;
-//    for (let int i = 0; i < 5; i = i + 1) {
-//        seq[i] = inicio + i;
-//    }
-//    return seq;
-//}
 
 // Funcao recursiva (fatorial)
 function int fatorial(int n) {

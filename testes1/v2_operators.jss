@@ -58,10 +58,3 @@ console.log("/=", val);
 val %= 4;   // 2
 console.log("%=", val);
 
-// Atribuicao composta com bool
-let bool flag = true;
-flag &&= false;  // false
-console.log("&&=", flag);
-
-flag ||= true;   // true
-console.log("||=", flag);

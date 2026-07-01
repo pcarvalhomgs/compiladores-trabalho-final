@@ -263,8 +263,9 @@ class CodeGenerator(SimplifiedJSSVisitor):
             if decl.expr():
                 # Literais de array precisam copiar elemento a elemento; o resto
                 # vira valor escalar/ponteiro e pode ser armazenado diretamente.
-                if self.is_array(typ) and decl.expr().assignment().logicalOr().logicalAnd()[0].equality()[0].relational()[0].additive()[0].multiplicative()[0].power().unary().postfix().primary().arrayLiteral():
-                    self.init_array_literal(ptr, typ, size, decl.expr().assignment().logicalOr().logicalAnd()[0].equality()[0].relational()[0].additive()[0].multiplicative()[0].power().unary().postfix().primary().arrayLiteral())
+                array_literal = self.direct_array_literal(decl.expr())
+                if self.is_array(typ) and array_literal:
+                    self.init_array_literal(ptr, typ, size, array_literal)
                 else:
                     val = self.cast_if_needed(self.visit(decl.expr()), typ)
                     self.builder.store(val.value, ptr)
@@ -854,6 +855,51 @@ class CodeGenerator(SimplifiedJSSVisitor):
             elem_ptr = self.builder.gep(ptr, [self.i32(0), self.i32(i)], inbounds=True)
             val = self.cast_if_needed(self.visit(expr), typ[:-2])
             self.builder.store(val.value, elem_ptr)
+
+    def direct_array_literal(self, expr_ctx):
+        """Retorna o arrayLiteral quando a expressao inteira e um literal [...]."""
+        try:
+            assignment = expr_ctx.assignment()
+            if assignment.assignable():
+                return None
+
+            logical_or = assignment.logicalOr()
+            logical_and = logical_or.logicalAnd()
+            if len(logical_and) != 1:
+                return None
+
+            equality = logical_and[0].equality()
+            if len(equality) != 1:
+                return None
+
+            relational = equality[0].relational()
+            if len(relational) != 1:
+                return None
+
+            additive = relational[0].additive()
+            if len(additive) != 1:
+                return None
+
+            multiplicative = additive[0].multiplicative()
+            if len(multiplicative) != 1:
+                return None
+
+            power = multiplicative[0].power()
+            if len(power) != 1:
+                return None
+
+            unary = power[0].unary()
+            if not unary.postfix():
+                return None
+
+            postfix = unary.postfix()
+            if postfix.INC() or postfix.DEC():
+                return None
+
+            primary = postfix.primary()
+            return primary.arrayLiteral()
+        except Exception:
+            return None
 
     def string_const(self, text):
         """Cria uma global string constante e retorna char* para seu inicio."""

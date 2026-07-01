@@ -12,6 +12,8 @@ i5 = 1000;
 let int [3] l1; 
 let int [3] l2 = [0+1 ,1+2 ,2+3]; 
 const str[3] nomes = ["Ana", "Bruno", "Carlos"];
+console.log(l2[0], l2[1], l2[2]);
+console.log(nomes[0], nomes[1], nomes[2]);
 
 // classes
 class Ponto { 
@@ -30,7 +32,7 @@ class Ponto {
 
 let Ponto p1; 
 p1 = new Ponto (1 ,2); 
-p1 = null; 
+//p1 = null; 
 const Ponto p2 = new Ponto (10 ,100);
 
 // Funçoes
