@@ -56,7 +56,7 @@ function void main() {
 
     imprimirMensagem("Ola Mundo");
 
-    let real media = calcularMedia(8, 7, 9);
+    let real media = calcularMedia(8, 7, 8);
     console.log("Media:", media);
 
     let bool par = ehPar(10);
@@ -81,4 +81,7 @@ function void main() {
 
     // Void com return
     processar();
+    let bool sd = 4>0;
+    console.log(sd);
+    console.log(int(sd));
 }

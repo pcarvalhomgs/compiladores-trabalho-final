@@ -65,13 +65,13 @@ def main():
             print(err)
     else:
         print("aceito")
-        # llvm_ir = CodeGenerator().generate(tree)
+        llvm_ir = CodeGenerator().generate(tree)
 
-        # output_path = sys.argv[2] if len(sys.argv) == 3 else "IR_gerado.ll"
+        output_path = sys.argv[2] if len(sys.argv) == 3 else "IR_gerado.ll"
     
-        # with open(output_path, "w", encoding="utf-8") as output_file:
-        #     output_file.write(llvm_ir)
-        # print(f"IR LLVM salvo em {output_path}")
+        with open(output_path, "w", encoding="utf-8") as output_file:
+            output_file.write(llvm_ir)
+        print(f"IR LLVM salvo em {output_path}")
 
 
 if __name__ == "__main__":
